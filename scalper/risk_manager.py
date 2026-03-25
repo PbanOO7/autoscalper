@@ -326,7 +326,7 @@ class RiskManager:
 
     def _get_total_unrealized_pnl(self) -> float:
         """Calculate total unrealized P&L across open positions."""
-        return sum(t.pnl for t in self.trades if t.is_open)
+        return sum(t.calculate_pnl(t.peak_price) for t in self.trades if t.is_open)
 
     def _activate_kill_switch(self, reason: str) -> None:
         """Activate the daily kill switch."""
