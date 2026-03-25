@@ -335,7 +335,7 @@ class Orchestrator:
 
                 # Check market hours
                 if not self._is_market_hours():
-                    if now.hour >= 15 and now.minute >= 30:
+                    if now >= _parse_time(self.config.orders.auto_square_off_time):
                         # After market - square off and stop
                         self._auto_square_off()
                         summary = self.risk_manager.get_daily_summary()

@@ -42,10 +42,12 @@ class TradeRecord:
     exit_reason: Optional[ExitReason] = None
     pnl: float = 0.0
     peak_price: float = 0.0     # Highest price since entry (for trailing stop)
+    last_price: float = 0.0      # Last known price (for unrealized P&L)
     is_open: bool = True
 
     def update_peak(self, current_price: float) -> None:
-        """Update the peak price for trailing stop calculation."""
+        """Update the peak price and last known price."""
+        self.last_price = current_price
         if current_price > self.peak_price:
             self.peak_price = current_price
 
@@ -190,6 +192,7 @@ class RiskManager:
             quantity=quantity,
             lots=lots,
             peak_price=entry_price,
+            last_price=entry_price,
         )
         self.trades.append(trade)
         self.daily_stats.total_lots_used += lots
@@ -326,7 +329,7 @@ class RiskManager:
 
     def _get_total_unrealized_pnl(self) -> float:
         """Calculate total unrealized P&L across open positions."""
-        return sum(t.pnl for t in self.trades if t.is_open)
+        return sum(t.calculate_pnl(t.last_price) for t in self.trades if t.is_open)
 
     def _activate_kill_switch(self, reason: str) -> None:
         """Activate the daily kill switch."""
@@ -342,7 +345,7 @@ class RiskManager:
         """
         open_trades = self.get_open_trades()
         unrealized = sum(
-            t.calculate_pnl(t.peak_price) for t in open_trades
+            t.calculate_pnl(t.last_price) for t in open_trades
         )
 
         return {
