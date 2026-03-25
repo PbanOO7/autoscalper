@@ -1,0 +1,85 @@
+# ============================================================
+# Nifty50 Options AutoScalper Configuration
+# ============================================================
+
+# DHAN API Credentials
+# Generate from: https://dhan.co → Profile → DhanHQ Trading APIs
+dhan:
+  client_id: ""          # Your DHAN Client ID
+  access_token: ""       # Your DHAN Access Token
+
+# Instrument Configuration
+instrument:
+  underlying: "NIFTY"
+  underlying_security_id: 13        # Nifty50 Security ID on DHAN
+  underlying_segment: "IDX_I"       # Index segment
+  exchange_segment: "NSE_FNO"       # F&O segment for options
+  lot_size: 25                      # Nifty lot size (as per exchange)
+
+# Scalping Strategy Parameters
+strategy:
+  # Timeframe for candle data (minutes)
+  candle_timeframe: 1               # 1-minute candles for scalping
+
+  # EMA Configuration
+  ema_fast_period: 9                # Fast EMA period
+  ema_slow_period: 21               # Slow EMA period
+
+  # RSI Configuration
+  rsi_period: 14                    # RSI calculation period
+  rsi_overbought: 70                # RSI overbought threshold (sell signal)
+  rsi_oversold: 30                  # RSI oversold threshold (buy signal)
+
+  # VWAP
+  use_vwap: true                    # Use VWAP as trend filter
+
+  # SuperTrend Configuration
+  supertrend_period: 10             # SuperTrend ATR period
+  supertrend_multiplier: 3.0        # SuperTrend multiplier
+
+  # Signal Confirmation
+  min_signals_for_entry: 2          # Minimum confirming signals to enter trade
+                                     # (out of: EMA crossover, RSI, VWAP, SuperTrend)
+
+  # Strike Selection
+  strike_mode: "ATM"                # ATM, ITM1, ITM2, OTM1, OTM2
+  strike_offset: 0                  # Additional offset from selected strike (in strike intervals)
+
+# Risk Management
+risk:
+  # Per-Trade Risk
+  stop_loss_percent: 20.0           # Stop-loss as % of option premium
+  profit_target_percent: 30.0       # Profit target as % of option premium
+  trailing_stop_enabled: true       # Enable trailing stop-loss
+  trailing_stop_percent: 15.0       # Trailing stop as % from peak premium
+
+  # Daily Limits
+  max_lots_per_day: 2               # Maximum lots to trade per day
+  max_daily_loss: 5000.0            # Maximum daily loss in INR (kill switch)
+  max_daily_profit: 10000.0         # Stop trading after this daily profit in INR
+
+  # Position Sizing
+  max_open_positions: 1             # Maximum simultaneous open positions
+
+# Order Configuration
+orders:
+  product_type: "INTRADAY"          # INTRADAY for options scalping
+  order_type: "MARKET"              # MARKET or LIMIT
+  limit_buffer_percent: 0.5         # Buffer % for limit orders above/below LTP
+  auto_square_off_time: "15:15"     # Auto square-off time (IST)
+  no_new_trade_after: "15:00"       # No new trades after this time (IST)
+  market_open_time: "09:20"         # Start trading after market settles (IST)
+
+# Monitoring & Logging
+monitoring:
+  log_level: "INFO"                 # DEBUG, INFO, WARNING, ERROR
+  log_file: "scalper.log"           # Log file path
+  console_dashboard: true           # Show live dashboard in terminal
+  dashboard_refresh_seconds: 2      # Dashboard refresh interval
+  trade_log_file: "trades.csv"      # CSV file to log all trades
+  notify_on_trade: true             # Print notification on each trade
+
+# Paper Trading Mode
+paper_trading:
+  enabled: true                     # Set to false for LIVE trading
+  initial_capital: 100000.0         # Starting capital for paper trading
